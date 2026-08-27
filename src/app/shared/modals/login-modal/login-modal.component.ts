@@ -74,43 +74,52 @@ import { IconComponent } from '../../icons/icon.component';
           <div class="p-6 pt-1 sm:p-7 sm:pt-1">
             <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-1">
               
-              <!-- Quick Demo Fill: Patient, Doctor, Receptionist & Nurse Buttons (Single Row) -->
-              <div class="grid grid-cols-4 gap-1.5 mb-3">
+              <!-- Quick Demo Fill: Patient, Receptionist, Nurse, Doctor & Pharmacist Buttons (Single Row) -->
+              <div class="grid grid-cols-5 gap-1 mb-3">
                 <button 
                   type="button" 
                   (click)="fillPatientCredentials()"
-                  class="py-2 px-1 rounded-xl bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center justify-center gap-1 transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
+                  class="py-2 px-1 rounded-xl bg-teal-50 hover:bg-teal-100/90 border border-teal-200 text-teal-900 text-[11px] font-bold flex flex-col sm:flex-row items-center justify-center gap-1 transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
                   aria-label="Fill Patient credentials"
                 >
-                  <app-icon name="user" wrapperClass="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Patient</span>
-                </button>
-                <button 
-                  type="button" 
-                  (click)="fillDoctorCredentials()"
-                  class="py-2 px-1 rounded-xl bg-emerald-50 hover:bg-emerald-100/90 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center justify-center gap-1 transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
-                  aria-label="Fill Doctor credentials"
-                >
-                  <app-icon name="stethoscope" wrapperClass="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Doctor</span>
+                  <app-icon name="user" wrapperClass="w-3.5 h-3.5 text-teal-600" />
+                  <span class="truncate">Patient</span>
                 </button>
                 <button 
                   type="button" 
                   (click)="fillReceptionistCredentials()"
-                  class="py-2 px-1 rounded-xl bg-teal-50 hover:bg-teal-100/90 border border-teal-200 text-teal-900 text-xs font-bold flex items-center justify-center gap-1 transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
+                  class="py-2 px-1 rounded-xl bg-teal-50 hover:bg-teal-100/90 border border-teal-200 text-teal-900 text-[11px] font-bold flex flex-col sm:flex-row items-center justify-center gap-1 transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
                   aria-label="Fill Receptionist credentials"
                 >
                   <app-icon name="user-circle" wrapperClass="w-3.5 h-3.5 text-teal-600" />
-                  <span>Reception</span>
+                  <span class="truncate">Reception</span>
                 </button>
                 <button 
                   type="button" 
                   (click)="fillNurseCredentials()"
-                  class="py-2 px-1 rounded-xl bg-cyan-50 hover:bg-cyan-100/90 border border-cyan-200 text-cyan-900 text-xs font-bold flex items-center justify-center gap-1 transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
+                  class="py-2 px-1 rounded-xl bg-teal-50 hover:bg-teal-100/90 border border-teal-200 text-teal-900 text-[11px] font-bold flex flex-col sm:flex-row items-center justify-center gap-1 transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
                   aria-label="Fill Nurse credentials"
                 >
-                  <app-icon name="activity" wrapperClass="w-3.5 h-3.5 text-cyan-600" />
-                  <span>Nurse</span>
+                  <app-icon name="activity" wrapperClass="w-3.5 h-3.5 text-teal-600" />
+                  <span class="truncate">Nurse</span>
+                </button>
+                <button 
+                  type="button" 
+                  (click)="fillDoctorCredentials()"
+                  class="py-2 px-1 rounded-xl bg-teal-50 hover:bg-teal-100/90 border border-teal-200 text-teal-900 text-[11px] font-bold flex flex-col sm:flex-row items-center justify-center gap-1 transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
+                  aria-label="Fill Doctor credentials"
+                >
+                  <app-icon name="stethoscope" wrapperClass="w-3.5 h-3.5 text-teal-600" />
+                  <span class="truncate">Doctor</span>
+                </button>
+                <button 
+                  type="button" 
+                  (click)="fillPharmacistCredentials()"
+                  class="py-2 px-1 rounded-xl bg-teal-50 hover:bg-teal-100/90 border border-teal-200 text-teal-900 text-[11px] font-bold flex flex-col sm:flex-row items-center justify-center gap-1 transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
+                  aria-label="Fill Pharmacist credentials"
+                >
+                  <app-icon name="pill" wrapperClass="w-3.5 h-3.5 text-teal-600" />
+                  <span class="truncate">Pharm</span>
                 </button>
               </div>
 
@@ -289,6 +298,15 @@ export class LoginModalComponent {
     this.loginForm.markAsTouched();
   }
 
+  fillPharmacistCredentials(): void {
+    this.loginForm.patchValue({
+      identifier: 'pharmacist@hms-hospital.org',
+      password: 'Pharmacist@123'
+    });
+    this.loginForm.markAsDirty();
+    this.loginForm.markAsTouched();
+  }
+
   onLogin(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -300,9 +318,10 @@ export class LoginModalComponent {
     const isDoctor = identifier.toLowerCase().includes('doctor') || identifier.toLowerCase().includes('dr.');
     const isNurse = identifier.toLowerCase().includes('nurse');
     const isReceptionist = identifier.toLowerCase().includes('reception');
+    const isPharmacist = identifier.toLowerCase().includes('pharmacist') || identifier.toLowerCase().includes('pharm');
 
-    const role = isDoctor ? 'doctor' : isNurse ? 'nurse' : isReceptionist ? 'receptionist' : 'patient';
-    const name = isDoctor ? 'Dr. Sarah Johnson' : isNurse ? 'Emily Watson' : isReceptionist ? 'Sarah Jenkins' : undefined;
+    const role = isDoctor ? 'doctor' : isNurse ? 'nurse' : isReceptionist ? 'receptionist' : isPharmacist ? 'pharmacist' : 'patient';
+    const name = isDoctor ? 'Dr. Sarah Johnson' : isNurse ? 'Emily Watson' : isReceptionist ? 'Sarah Jenkins' : isPharmacist ? 'Alex Mercer, RPh' : undefined;
 
     this.authService.login(identifier, name, role);
 
@@ -315,6 +334,8 @@ export class LoginModalComponent {
         this.router.navigate(['/nurse']);
       } else if (isReceptionist) {
         this.router.navigate(['/receptionist']);
+      } else if (isPharmacist) {
+        this.router.navigate(['/pharmacist']);
       } else {
         this.router.navigate(['/patient-portal']);
       }

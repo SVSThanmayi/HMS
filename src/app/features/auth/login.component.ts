@@ -156,7 +156,7 @@ type AuthMode = 'login' | 'signup' | 'forgot-password';
                   Login
                 </h2>
 
-                <!-- Quick Patient, Doctor, Receptionist, Nurse & Pharmacist Autofill Badges (Spacious Single Row - Unified Colors) -->
+                <!-- Quick Patient, Receptionist, Nurse, Doctor & Pharmacist Autofill Badges (Spacious Single Row - Unified Colors) -->
                 <div class="mt-3 flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap py-0.5">
                   <button 
                     type="button" 
@@ -166,15 +166,6 @@ type AuthMode = 'login' | 'signup' | 'forgot-password';
                   >
                     <app-icon name="user" wrapperClass="w-3.5 h-3.5 text-teal-600" />
                     <span>Patient</span>
-                  </button>
-                  <button 
-                    type="button" 
-                    (click)="fillDoctorCredentials()"
-                    class="shrink-0 inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200/80 text-xs font-semibold transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
-                    title="Fill Doctor credentials"
-                  >
-                    <app-icon name="stethoscope" wrapperClass="w-3.5 h-3.5 text-teal-600" />
-                    <span>Doctor</span>
                   </button>
                   <button 
                     type="button" 
@@ -193,6 +184,15 @@ type AuthMode = 'login' | 'signup' | 'forgot-password';
                   >
                     <app-icon name="activity" wrapperClass="w-3.5 h-3.5 text-teal-600" />
                     <span>Nurse</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    (click)="fillDoctorCredentials()"
+                    class="shrink-0 inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200/80 text-xs font-semibold transition cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
+                    title="Fill Doctor credentials"
+                  >
+                    <app-icon name="stethoscope" wrapperClass="w-3.5 h-3.5 text-teal-600" />
+                    <span>Doctor</span>
                   </button>
                   <button 
                     type="button" 
