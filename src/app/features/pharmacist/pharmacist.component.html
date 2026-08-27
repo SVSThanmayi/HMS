@@ -1,0 +1,512 @@
+<div class="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-900">
+  
+  <!-- ================================================================= -->
+  <!-- 1. TOP NAVBAR (PHARMACIST PORTAL) -->
+  <!-- ================================================================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Portal Title -->
+      <div class="flex items-center gap-3">
+        <a routerLink="/" class="flex items-center gap-2.5 group">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-600 to-[#005f54] text-white flex items-center justify-center font-black text-sm shadow-md shadow-teal-900/10 group-hover:scale-105 transition-transform">
+            HMS
+          </div>
+          <div>
+            <h1 class="text-base sm:text-lg font-black tracking-tight text-slate-900 leading-none">
+              HMS Pharmacy
+            </h1>
+            <span class="text-[11px] font-semibold text-teal-700 uppercase tracking-wider">
+              Central Dispensing & Billing
+            </span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Right: Pharmacist Profile & Logout -->
+      <div class="flex items-center gap-3 sm:gap-4">
+        
+        <!-- Pharmacist Badge -->
+        <div class="hidden md:flex items-center gap-2.5 pl-1.5 pr-4 py-1.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+          <app-avatar [name]="currentPharmacist()?.name || 'Alex Mercer, RPh'" sizeClass="w-8 h-8 rounded-xl" />
+          <div class="text-left">
+            <div class="text-xs font-bold text-slate-900 leading-tight">
+              {{ currentPharmacist()?.name || 'Alex Mercer, RPh' }}
+            </div>
+            <div class="text-[10px] text-teal-700 font-semibold leading-none">
+              {{ currentPharmacist()?.counterNumber || 'Counter #2' }} • Licensed Pharmacist
+            </div>
+          </div>
+        </div>
+
+        <!-- Logout Button -->
+        <button 
+          type="button" 
+          (click)="logout()"
+          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-slate-200/80 hover:border-rose-200 text-xs font-bold transition cursor-pointer active:scale-95"
+          title="Sign out of Pharmacist Portal"
+        >
+          <app-icon name="log-out" wrapperClass="w-3.5 h-3.5" />
+          <span class="hidden sm:inline">Logout</span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ================================================================= -->
+  <!-- 2. MAIN CONTENT AREA -->
+  <!-- ================================================================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    
+    <!-- UNIVERSAL PATIENT SEARCH (MATCHING DOCTOR PORTAL LAYOUT) -->
+    <section class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200 shadow-xs relative z-30 space-y-2">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+        
+        <!-- Pharmacy Dispensing Icon & Title -->
+        <div class="flex items-center gap-3 shrink-0">
+          <div class="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center shadow-2xs">
+            <app-icon name="pill" wrapperClass="w-5 h-5 text-teal-700" />
+          </div>
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold tracking-tight text-slate-900 leading-tight">
+              Pharmacy Dispensing
+            </h2>
+            <span class="text-xs font-medium text-slate-500 leading-none">Prescription Review & POS Invoicing</span>
+          </div>
+        </div>
+
+        <!-- Search Input with Floating Autocomplete Dropdown -->
+        <div class="flex-1 relative">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <app-icon name="search" wrapperClass="w-4 h-4 text-slate-400" />
+            </div>
+            <input 
+              type="text" 
+              [ngModel]="searchQuery()" 
+              (ngModelChange)="onSearchInputChange($event)"
+              placeholder="Search patient by Name, Phone (+91...), or Patient ID (PT-...)"
+              class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs sm:text-sm placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition shadow-2xs"
+            />
+            @if (searchQuery().trim().length > 0) {
+              <button 
+                type="button" 
+                (click)="clearSearch()"
+                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 cursor-pointer"
+                aria-label="Clear search"
+              >
+                <app-icon name="x" wrapperClass="w-4 h-4" />
+              </button>
+            }
+          </div>
+
+          <!-- Floating Autocomplete Dropdown Menu -->
+          @if (searchQuery().trim().length > 0) {
+            <div class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-xl border border-slate-200 z-50 overflow-hidden max-h-72 overflow-y-auto py-1 divide-y divide-slate-100 animate-fade-in">
+              @if (searchResults().length > 0) {
+                @for (p of searchResults(); track p.id) {
+                  <button 
+                    type="button" 
+                    (click)="selectPatient(p)"
+                    class="w-full px-4 py-3 flex items-center text-left hover:bg-teal-50/70 transition cursor-pointer group"
+                  >
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                      <span class="font-bold text-slate-900 text-sm group-hover:text-teal-900">
+                        {{ p.name }}
+                      </span>
+                      <span class="text-xs text-slate-500 font-medium">
+                        • {{ p.phone }}
+                      </span>
+                      <span class="text-xs font-mono font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/60 ml-2">
+                        {{ p.id }}
+                      </span>
+                      <span class="text-xs font-mono text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
+                        Token: {{ p.tokenNumber || 'T-101' }}
+                      </span>
+                    </div>
+                  </button>
+                }
+              } @else {
+                <div class="px-4 py-3 text-sm text-slate-600 font-medium select-none">
+                  No patient found matching "<strong>{{ searchQuery().trim() }}</strong>"
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =============================================================== -->
+    <!-- 3. PATIENT PRESCRIPTION CONTENT (OR EMPTY SEARCH STATE) -->
+    <!-- =============================================================== -->
+    @if (activePatient()) {
+      
+      <div class="space-y-6 animate-fade-in">
+        
+        <!-- PATIENT SUMMARY HEADER CARD -->
+        <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            
+            <div class="flex items-center gap-3.5">
+              <!-- Patient Avatar matching Doctor Portal -->
+              <app-avatar [name]="activePatient()!.name" sizeClass="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl ring-2 ring-teal-400/40 text-xl font-bold" />
+              
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+                    {{ activePatient()!.name }}
+                  </h2>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-teal-50 text-teal-800 border border-teal-200">
+                    {{ activePatient()!.id }}
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-teal-50 text-teal-800 border border-teal-200">
+                    Token: {{ activePatient()!.tokenNumber || 'T-101' }}
+                  </span>
+                </div>
+                
+                <p class="text-xs text-slate-600 mt-1">
+                  {{ activePatient()!.gender }}, {{ activePatient()!.age }} yrs • Blood: <strong class="text-slate-900">{{ activePatient()!.bloodGroup }}</strong> • Phone: <strong class="text-slate-900">{{ activePatient()!.phone }}</strong>
+                </p>
+              </div>
+            </div>
+
+            <!-- Doctor Summary Badge -->
+            <div class="flex items-center gap-3 flex-wrap">
+              <div class="text-left sm:text-right">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Prescribing Physician</span>
+                <span class="text-xs font-bold text-slate-900">{{ activeDoctorName() }}</span>
+                <span class="text-[11px] text-teal-700 block font-medium">{{ activeDoctorSpecialty() }}</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PRESCRIPTION MEDICINES TABLE -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
+          
+          <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/70">
+            <div class="flex items-center gap-2">
+              <app-icon name="file-text" wrapperClass="w-5 h-5 text-teal-600" />
+              <h3 class="text-sm sm:text-base font-bold text-slate-900">
+                Prescribed Medicines for Fulfillment
+              </h3>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200 shrink-0">
+              {{ activePrescriptionMedicines().length }} {{ activePrescriptionMedicines().length === 1 ? 'Medicine' : 'Medicines' }} Prescribed
+            </span>
+          </div>
+
+          <!-- Table Container -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs sm:text-sm">
+              <thead class="bg-slate-50 border-b border-slate-200 font-bold uppercase text-[11px] text-slate-700">
+                <tr>
+                  <th class="p-3.5 text-center w-12">#</th>
+                  <th class="p-3.5">Medicine Name & Form</th>
+                  <th class="p-3.5">Dosage</th>
+                  <th class="p-3.5">Directions to Use</th>
+                  <th class="p-3.5 whitespace-nowrap">Frequency & Duration</th>
+                  <th class="p-3.5 text-right whitespace-nowrap">Est. Price</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                @for (med of activePrescriptionMedicines(); track med.name; let idx = $index) {
+                  <tr class="hover:bg-teal-50/40 transition-colors">
+                    <td class="p-3.5 text-center font-bold text-slate-400">
+                      {{ idx + 1 }}
+                    </td>
+                    <td class="p-3.5">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-bold text-slate-900 text-sm">
+                          {{ med.name }}
+                        </span>
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200">
+                          {{ med.form || 'Tablet' }} {{ med.strength ? '• ' + med.strength : '' }}
+                        </span>
+                      </div>
+                    </td>
+                    <td class="p-3.5 font-bold text-slate-900 whitespace-nowrap">
+                      {{ med.dosage }}
+                    </td>
+                    <td class="p-3.5 text-slate-700 font-medium max-w-sm">
+                      {{ med.instructions || med.reason || 'Take as directed by doctor' }}
+                    </td>
+                    <td class="p-3.5 whitespace-nowrap">
+                      <span class="font-semibold text-slate-800 block">{{ med.frequency }}</span>
+                      <span class="text-[11px] text-slate-500">{{ med.duration || '5 Days' }}</span>
+                    </td>
+                    <td class="p-3.5 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
+                      ${{ getMedicineEstimatedPrice(med.name).toFixed(2) }}
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="6" class="p-8 text-center text-xs text-slate-500 font-medium">
+                      No prescription medicines found for this patient.
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ACTION BAR: GENERATE PAY RECEIPT & DONE BUTTONS -->
+          <div class="p-4 sm:p-6 bg-slate-50/90 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <div class="flex items-center gap-2 text-xs text-slate-600">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Prescription verified. Ready to generate invoice and complete dispensing.</span>
+            </div>
+
+            <!-- TWO PRIMARY BUTTONS -->
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+              
+              <!-- BUTTON 1: GENERATE PAY RECEIPT -->
+              <button 
+                type="button" 
+                (click)="generatePayReceipt()"
+                class="flex-1 sm:flex-none px-5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 border-2 border-teal-600 text-teal-800 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95 hover:shadow-md"
+                title="Generate itemized pay receipt with PDF generation"
+              >
+                <app-icon name="receipt" wrapperClass="w-4 h-4 text-teal-700" />
+                <span>Generate Pay Receipt</span>
+              </button>
+
+              <!-- BUTTON 2: DONE (Click after giving medicines, generating receipt, and patient paid) -->
+              <button 
+                type="button" 
+                (click)="onDoneDispensing()"
+                class="flex-1 sm:flex-none px-6 py-2.5 rounded-2xl bg-gradient-to-r from-teal-600 to-[#005f54] hover:from-teal-700 hover:to-teal-900 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-teal-700/20 active:scale-95 hover:shadow-lg"
+                title="Complete dispensing and record payment"
+              >
+                <app-icon name="check-circle" wrapperClass="w-4 h-4 text-white" />
+                <span>Done</span>
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    } @else {
+      
+      <!-- =============================================================== -->
+      <!-- EMPTY SEARCH STATE (MATCHING DOCTOR PORTAL) -->
+      <!-- =============================================================== -->
+      <div class="bg-white rounded-3xl p-8 sm:p-16 border border-slate-200 shadow-xs text-center space-y-3 px-4 flex flex-col items-center justify-center">
+        <div class="w-16 h-16 rounded-2xl bg-teal-50 border border-teal-200/80 text-teal-600 flex items-center justify-center mx-auto shadow-2xs">
+          <app-icon name="search" wrapperClass="w-8 h-8 text-teal-600" />
+        </div>
+        <h2 class="text-lg sm:text-xl font-bold text-slate-800 tracking-tight">
+          Search for the patient to view prescription
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
+          Type a patient's name, phone number, or ID in the search bar above and click on their name to view prescriptions and generate payment receipts.
+        </p>
+      </div>
+
+    }
+
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- 4. PAY RECEIPT PREVIEW POPUP MODAL (PRINT & PDF GENERATION) -->
+  <!-- ================================================================= -->
+  @if (isReceiptModalOpen() && currentReceipt()) {
+    
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto animate-fade-in">
+      
+      <div class="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-6 max-h-[90vh]">
+        
+        <!-- Modal Header -->
+        <div class="px-6 py-4 bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white flex items-center justify-between gap-4 shrink-0">
+          <div class="flex items-center gap-2.5">
+            <app-icon name="receipt" wrapperClass="w-5 h-5 text-teal-400" />
+            <div>
+              <h3 class="text-base sm:text-lg font-bold leading-tight text-white">
+                Official Hospital Payment Receipt
+              </h3>
+              <span class="text-xs text-teal-300/80 font-mono">
+                Receipt No: {{ currentReceipt()!.receiptNumber }}
+              </span>
+            </div>
+          </div>
+
+          <button 
+            type="button" 
+            (click)="closeReceiptModal()"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+            aria-label="Close modal"
+          >
+            <app-icon name="x" wrapperClass="w-4 h-4" />
+          </button>
+        </div>
+
+        <!-- Scrollable Receipt Body -->
+        <div class="p-6 overflow-y-auto space-y-5 text-slate-800 text-xs sm:text-sm">
+          
+          <!-- Hospital Header -->
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b-2 border-teal-600">
+            <div>
+              <h2 class="text-lg sm:text-xl font-black text-teal-900 tracking-tight">
+                HMS MULTI-SPECIALTY HOSPITAL
+              </h2>
+              <p class="text-xs font-bold text-teal-700">Department of Central Pharmacy & Dispensing Services</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">100 Hospital Boulevard, Bellandur, Bengaluru, KA 560103</p>
+              <p class="text-[10px] text-slate-400">Ph: +91 80 4455 6677 | GSTIN: 29AAAAA0000A1Z5 | License: DL-2024-88910</p>
+            </div>
+
+            <div class="text-left sm:text-right shrink-0">
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                STATUS: PAID
+              </span>
+              <p class="text-xs font-mono font-bold text-slate-900 mt-1.5">{{ currentReceipt()!.receiptNumber }}</p>
+              <p class="text-[11px] text-slate-500">{{ currentReceipt()!.dateStr }} • {{ currentReceipt()!.timeStr }}</p>
+            </div>
+          </div>
+
+          <!-- Patient & Doctor Info Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-teal-800 uppercase tracking-wider block mb-1">Patient Details</span>
+              <p class="font-bold text-slate-900 text-sm">{{ currentReceipt()!.patientName }}</p>
+              <p class="text-xs text-slate-600">ID: <strong class="text-slate-900 font-mono">{{ currentReceipt()!.patientId }}</strong> | Token: <strong class="text-slate-900 font-mono">{{ currentReceipt()!.tokenNumber }}</strong></p>
+              <p class="text-xs text-slate-600">Age/Gender: {{ currentReceipt()!.age }} yrs / {{ currentReceipt()!.gender }} ({{ currentReceipt()!.bloodGroup }})</p>
+              <p class="text-xs text-slate-600">Phone: {{ currentReceipt()!.phone }}</p>
+            </div>
+
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-teal-800 uppercase tracking-wider block mb-1">Prescription & Dispensing Info</span>
+              <p class="font-bold text-slate-900">{{ currentReceipt()!.doctorName }}</p>
+              <p class="text-xs text-slate-600">{{ currentReceipt()!.specialty }}</p>
+              
+              <!-- Diagnosis ONLY if present -->
+              @if (currentReceipt()!.hasDiagnosis && currentReceipt()!.diagnosis) {
+                <p class="text-xs text-slate-900 bg-teal-100/70 px-2 py-0.5 rounded border border-teal-200 font-medium">
+                  <strong>Diagnosis:</strong> {{ currentReceipt()!.diagnosis }}
+                </p>
+              }
+
+              <p class="text-xs text-slate-500">Dispensed By: {{ currentReceipt()!.dispensedBy }} ({{ currentReceipt()!.counterNumber }})</p>
+            </div>
+
+          </div>
+
+          <!-- Itemized Charges Table -->
+          <div class="border border-slate-200 rounded-2xl overflow-hidden">
+            <table class="w-full text-left text-xs sm:text-sm">
+              <thead class="bg-teal-50/80 border-b border-slate-200 font-bold uppercase text-[10px] text-teal-900">
+                <tr>
+                  <th class="p-3 text-center w-10">#</th>
+                  <th class="p-3">Item Description</th>
+                  <th class="p-3 text-center">Category</th>
+                  <th class="p-3 text-center">Qty</th>
+                  <th class="p-3 text-right">Unit Price</th>
+                  <th class="p-3 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                @for (item of currentReceipt()!.items; track item.id; let idx = $index) {
+                  <tr class="hover:bg-slate-50/60">
+                    <td class="p-3 text-center font-bold text-slate-400">{{ idx + 1 }}</td>
+                    <td class="p-3">
+                      <span class="font-bold text-slate-900 block">{{ item.description }}</span>
+                      <span class="text-[11px] text-slate-500 block">{{ item.details }}</span>
+                    </td>
+                    <td class="p-3 text-center">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700">
+                        {{ item.category }}
+                      </span>
+                    </td>
+                    <td class="p-3 text-center font-semibold">{{ item.qty }}</td>
+                    <td class="p-3 text-right font-mono text-slate-700">${{ item.unitPrice.toFixed(2) }}</td>
+                    <td class="p-3 text-right font-mono font-bold text-slate-900">${{ item.totalPrice.toFixed(2) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Financial Totals -->
+          <div class="flex flex-col sm:flex-row justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="space-y-1 text-xs text-slate-500 max-w-xs">
+              <p><strong>Payment Mode:</strong> {{ currentReceipt()!.paymentMethod }}</p>
+              <p>Medicines once sold cannot be returned without original cash receipt. Keep medications stored below 25°C.</p>
+            </div>
+
+            <div class="space-y-1.5 sm:w-64">
+              <div class="flex justify-between text-xs text-slate-600">
+                <span>Subtotal:</span>
+                <span class="font-mono text-slate-900">${{ currentReceipt()!.subtotal.toFixed(2) }}</span>
+              </div>
+              @if (currentReceipt()!.insuranceDiscount > 0) {
+                <div class="flex justify-between text-xs text-emerald-700 font-semibold">
+                  <span>Insurance Co-Pay:</span>
+                  <span class="font-mono">-${{ currentReceipt()!.insuranceDiscount.toFixed(2) }}</span>
+                </div>
+              }
+              <div class="flex justify-between text-xs text-slate-600">
+                <span>Healthcare Tax (5%):</span>
+                <span class="font-mono text-slate-900">${{ currentReceipt()!.taxAmount.toFixed(2) }}</span>
+              </div>
+              <div class="pt-2 border-t border-slate-300 flex justify-between text-sm sm:text-base font-bold text-teal-900">
+                <span>Total Paid:</span>
+                <span class="font-mono text-teal-950">${{ currentReceipt()!.grandTotal.toFixed(2) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Signature block -->
+          <div class="flex justify-between items-end pt-2 text-[11px] text-slate-500">
+            <div>
+              <p>Computer Generated Invoice • Authorized for Insurance Claim</p>
+            </div>
+            <div class="text-right">
+              <div class="w-32 border-b border-slate-400 mb-1 ml-auto"></div>
+              <p class="font-bold text-slate-900">{{ currentReceipt()!.dispensedBy }}</p>
+              <p class="text-[10px]">Registered Pharmacist</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Modal Footer Actions: Save & Close only -->
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
+          
+          <!-- Save Button (Downloads PDF via pdfMake) -->
+          <button 
+            type="button" 
+            (click)="downloadPdf()"
+            class="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+            title="Save receipt as PDF"
+          >
+            <app-icon name="download" wrapperClass="w-4 h-4 text-white" />
+            <span>Save</span>
+          </button>
+
+          <!-- Close Button -->
+          <button 
+            type="button" 
+            (click)="closeReceiptModal()"
+            class="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition cursor-pointer active:scale-95"
+          >
+            Close
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

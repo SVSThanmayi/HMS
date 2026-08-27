@@ -1,3 +1,417 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+@layer base {
+  html {
+    font-family: 'Roboto', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    scroll-behavior: smooth;
+    color-scheme: light;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  body {
+    font-family: 'Roboto', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background-color: #f8fafc;
+    color: #0f172a;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.01em;
+  }
+
+  app-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    flex-shrink: 0;
+    line-height: 0;
+  }
+
+  app-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+  }
+}
+
+/* ==========================================================================
+   Portal Layout Standard (White Smoke #f5f5f5 - Clean Distraction-Free Theme)
+   Standardized background for all HMS Portals (Receptionist, Patient, Doctor, Admin, etc.)
+   ========================================================================== */
+
+.portal-bg,
+.bg-portal,
+.bg-whitesmoke {
+  background-color: #f5f5f5;
+}
+
+/* ==========================================================================
+   Healthcare Color Gradients & Glassmorphism System
+   ========================================================================== */
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 0 1px 1px rgba(226, 232, 240, 0.8);
+}
+
+.glass-card-dark {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   Interactive Button Glow & Shimmer Sweep
+   ========================================================================== */
+
+.btn-healthcare-primary {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #047857 100%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.45), 0 0 15px rgba(13, 148, 136, 0.2);
+}
+
+.btn-healthcare-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 15px 35px -5px rgba(13, 148, 136, 0.65), 0 0 25px rgba(45, 212, 191, 0.4);
+}
+
+.btn-healthcare-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.25) 45%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.25) 55%,
+    transparent 80%
+  );
+  transform: rotate(30deg) translateX(-100%);
+  transition: transform 0.8s ease-in-out;
+}
+
+.btn-healthcare-primary:hover::after {
+  transform: rotate(30deg) translateX(100%);
+}
+
+/* ==========================================================================
+   Card Elevate & Glow on Hover
+   ========================================================================== */
+
+.hover-medical-card {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.hover-medical-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(45, 212, 191, 0.5);
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.1), 0 0 25px -5px rgba(13, 148, 136, 0.15);
+}
+
+/* ==========================================================================
+   Global Custom Scrollbars: Pure Transparent Overlay (No OS Gutter, No White Track, No Arrows)
+   ========================================================================== */
+
+/* Completely hide native browser scrollbars across all browsers */
+html,
+body,
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+*::-webkit-scrollbar-track,
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+*::-webkit-scrollbar-button,
+html::-webkit-scrollbar-button,
+body::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* ==========================================================================
+   Keyframe Animations
+   ========================================================================== */
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 12px rgba(45, 212, 191, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.5s infinite cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+@keyframes float-subtle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float {
+  animation: float-subtle 4s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Continuous Opposite Infinite Marquee for Patients Speak Rows
+   ========================================================================== */
+
+@keyframes marquee-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-left 40s linear infinite;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: marquee-right 40s linear infinite;
+}
+
+.animate-marquee-left:hover,
+.animate-marquee-right:hover {
+  animation-play-state: paused;
+}
+
+/* ==========================================================================
+   Cinematic Ken Burns Backdrop Animation
+   ========================================================================== */
+
+@keyframes ken-burns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.06) translate(-0.4%, -0.4%);
+  }
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+}
+
+.animate-ken-burns {
+  animation: ken-burns 28s ease-in-out infinite alternate;
+}
+
+/* ==========================================================================
+   Premium Hospital Background & Pulse Animations for Auth / Portal
+   ========================================================================== */
+
+@keyframes pulse-ecg {
+  0% {
+    stroke-dashoffset: 1200;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-ecg {
+  stroke-dasharray: 600;
+  animation: pulse-ecg 7s linear infinite;
+}
+
+@keyframes orb-float-1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(60px, -70px) scale(1.2);
+  }
+  66% {
+    transform: translate(-40px, 50px) scale(0.9);
+  }
+}
+
+@keyframes orb-float-2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-70px, 60px) scale(1.15);
+  }
+  66% {
+    transform: translate(50px, -40px) scale(0.9);
+  }
+}
+
+@keyframes orb-float-3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(40px, 40px) scale(1.25);
+  }
+}
+
+.animate-orb-1 {
+  animation: orb-float-1 16s ease-in-out infinite;
+}
+
+.animate-orb-2 {
+  animation: orb-float-2 22s ease-in-out infinite;
+}
+
+.animate-orb-3 {
+  animation: orb-float-3 15s ease-in-out infinite;
+}
+
+@keyframes float-particle {
+  0% {
+    transform: translateY(105vh) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.7;
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-10vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-particle-1 {
+  animation: float-particle 18s linear infinite;
+}
+.animate-particle-2 {
+  animation: float-particle 24s linear infinite 3s;
+}
+.animate-particle-3 {
+  animation: float-particle 20s linear infinite 7s;
+}
+.animate-particle-4 {
+  animation: float-particle 26s linear infinite 11s;
+}
+.animate-particle-5 {
+  animation: float-particle 22s linear infinite 5s;
+}
+.animate-particle-6 {
+  animation: float-particle 28s linear infinite 14s;
+}
+
+/* Shimmering border glow on the login card (Dark Theme) */
+.auth-glow-card {
+  position: relative;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.8), 0 0 50px -10px rgba(13, 148, 136, 0.35);
+}
+
+.auth-glow-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.7), rgba(56, 189, 248, 0.3), rgba(16, 185, 129, 0.6), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Shimmering border glow on the login card (Light Theme) */
+.auth-glow-card-light {
+  position: relative;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(13, 148, 136, 0.2);
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 35px -10px rgba(13, 148, 136, 0.2);
+}
+
+.auth-glow-card-light::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.5), rgba(56, 189, 248, 0.3), rgba(16, 185, 129, 0.4), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
